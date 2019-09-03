@@ -43,11 +43,15 @@ function dragPoint(point) {
 
 class Point {
 
-    constructor({ root, type = 'vertex', x, y, r = 5, draggable = false }) {
+    constructor({ root, x, y, r = 5,
+        path = null, type = 'vertex', draggable = false,
+    }) {
         this.element = null
 
         this.root = root
         this.type = type
+
+        this.path = path;
 
         this.x = x;
         this.y = y;
@@ -55,7 +59,7 @@ class Point {
 
         this.draggable = draggable
 
-        this.create(x, y, r, type)
+        this.create()
     }
 
     static addPoint(opts) {
@@ -63,11 +67,11 @@ class Point {
     }
 
 
-    create(x, y, r, type) {
+    create() {
         this.element = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
 
         const attrs = {
-            class: `point ${type}`,
+            class: `point ${this.type}`,
             cx: this.x,
             cy: this.y,
             r: this.r
@@ -102,39 +106,72 @@ class Point {
     set pos({ x, y }) {
         this.element.setAttribute('cx', x || this.x)
         this.element.setAttribute('cy', y || this.y)
+
+        this.path.onChange()
     }
 
 
 }
+
+class Path {
+    constructor({ root, points }) {
+        this.root = root;
+        this.points = points;
+        this.vertices = [];
+        this.element = null;
+        this.create()
+    }
+
+    create() {
+        this.element = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+        this.element.onChange = this.onChange
+
+        this.vertices = this.points.map(p => new Point({
+            root: this.root,
+            path: this.element,
+            ...p
+        }))
+
+        const attrs = {
+            class: 'path',
+            d: 'M ' + this.vertices.map(v => v.pos).map(({ x, y }) => `${x},${y}`).join(' ')
+        }
+
+        for (let key in attrs) {
+            this.element.setAttribute(key, attrs[key])
+        }
+
+        this.root.insertBefore(this.element, this.root.firstElementChild)
+    }
+
+    onChange = () => {
+        this.element.setAttribute('d', 'M ' + this.vertices.map(v => v.pos).map(({ x, y }) => `${x},${y}`).join(' '))
+    }
+}
+
 
 const SVG = {
     root: document.querySelector('#drawing svg'),
-    create(tagname, attrs = null) {
-        const el = document.createElementNS("http://www.w3.org/2000/svg", tagname);
-
-        if (attrs) {
-            for (let key in attrs) {
-                el.setAttribute(key, attrs[key])
-            }
-        }
-
-        this.root.appendChild(el)
-
-        return el
-    }
 }
 
 
-const c = Point.addPoint({
+const path = new Path({
     root: SVG.root,
-    x: 90,
-    y: 90,
-    draggable: true
-})
-
-const b = Point.addPoint({
-    root: SVG.root,
-    x: 290,
-    y: 190,
-    draggable: true
+    points: [
+        {
+            x: 90,
+            y: 90,
+            draggable: true
+        },
+        {
+            x: 290,
+            y: 190,
+            draggable: true
+        },
+        {
+            x: 300,
+            y: 150,
+            draggable: true
+        },
+    ]
 })

@@ -4,13 +4,24 @@
 }
 
 #drawing {
-    height: 100vh;
-    width: 100vw;
+    height: 500px;
+    width: 90%;
+
+    border: 1px solid #000000;
+    margin: auto;
+    margin-top: 10px;
+    display: block;
 }
 
 svg {
-    width: 90%;
-    height: 90%;
+    width: 100%;
+    height: 100%;
+}
+
+.path {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 2;
 }
 
 .point {
