@@ -115,26 +115,26 @@ class Point {
 
 class Path {
     constructor({ root, points }) {
-        this.root = root;
-        this.points = points;
-        this.vertices = [];
+
         this.element = null;
-        this.create()
+
+        this.root = root;
+        this._points = points;
+
+        this.points = [];
+
+        this.create();
+        this.setPoints();
+        this.setPath();
     }
 
     create() {
         this.element = document.createElementNS("http://www.w3.org/2000/svg", 'path');
         this.element.onChange = this.onChange
 
-        this.vertices = this.points.map(p => new Point({
-            root: this.root,
-            path: this.element,
-            ...p
-        }))
-
         const attrs = {
             class: 'path',
-            d: 'M ' + this.vertices.map(v => v.pos).map(({ x, y }) => `${x},${y}`).join(' ')
+            d: 'M 0,0'
         }
 
         for (let key in attrs) {
@@ -144,8 +144,54 @@ class Path {
         this.root.insertBefore(this.element, this.root.firstElementChild)
     }
 
+    setPoints() {
+        this.points = this._points.map(p => {
+
+            if (!p.control) {
+                return new Point({
+                    root: this.root,
+                    path: this.element,
+                    ...p
+                })
+            }
+
+            return {
+                control: p.control,
+                points: p.points.map(q => {
+                    return new Point({
+                        type: 'control',
+                        root: this.root,
+                        path: this.element,
+                        ...q
+                    })
+                })
+            }
+        })
+    }
+
+    setPath() {
+        let d = [];
+        for (let item of this.points) {
+
+            if (item instanceof Point) {
+                let { x, y } = item.pos;
+                d.push(`${x},${y}`)
+            } else {
+                d.push(item.control)
+                for (let p of item.points) {
+                    let { x, y } = p.pos;
+                    d.push(`${x},${y}`)
+                }
+            }
+
+        }
+
+        this.element.setAttribute('d', 'M ' + d.join(' '))
+    }
+
+
     onChange = () => {
-        this.element.setAttribute('d', 'M ' + this.vertices.map(v => v.pos).map(({ x, y }) => `${x},${y}`).join(' '))
+        this.setPath()
     }
 }
 
@@ -164,13 +210,38 @@ const path = new Path({
             draggable: true
         },
         {
-            x: 290,
-            y: 190,
+            control: 'C',
+            points: [
+                {
+                    x: 290,
+                    y: 190,
+                    draggable: true
+                },
+                {
+                    x: 300,
+                    y: 290,
+                    draggable: true
+                }
+            ]
+        },
+        {
+            x: 350,
+            y: 150,
             draggable: true
         },
         {
-            x: 300,
-            y: 150,
+            control: 'Q',
+            points: [
+                {
+                    x: 350,
+                    y: 250,
+                    draggable: true
+                },
+            ]
+        },
+        {
+            x: 550,
+            y: 350,
             draggable: true
         },
     ]

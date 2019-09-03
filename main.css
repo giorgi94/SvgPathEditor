@@ -26,7 +26,16 @@ svg {
 
 .point {
     cursor: move;
+
+    stroke-width: 5;
+}
+
+.vertex {
     fill: rgb(46, 99, 212);
     stroke: rgba(46, 99, 212, 0.5);
-    stroke-width: 5;
+}
+
+.control {
+    fill: rgb(226, 211, 76);
+    stroke: rgba(226, 211, 76, 0.5);
 }
