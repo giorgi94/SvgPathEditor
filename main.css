@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#drawing {
+    height: 100vh;
+    width: 100vw;
+}
+
+svg {
+    width: 90%;
+    height: 90%;
+}
+
+.point {
+    cursor: move;
+    fill: rgb(46, 99, 212);
+    stroke: rgba(46, 99, 212, 0.5);
+    stroke-width: 5;
+}
