@@ -127,18 +127,27 @@ class Point {
 }
 
 class Path {
-    constructor({ root, points }) {
+    constructor({ root, points = [], attrs = null }) {
+        this.controls = ['L', 'Q', 'C']
 
         this.element = null;
         this.polyline = null;
 
         this.root = root;
-        this._points = points;
+        this.attrs = attrs;
 
         this.points = [];
 
-        this.create();
-        this.setPoints();
+        this.init(points);
+    }
+
+
+    init(points) {
+        if (!this.element) {
+            this.create();
+        }
+
+        this.Points = points;
         this.setPath();
     }
 
@@ -147,7 +156,15 @@ class Path {
             "http://www.w3.org/2000/svg", 'path');
         this.polyline = document.createElementNS(
             "http://www.w3.org/2000/svg", 'polyline');
-        this.element.onChange = this.onChange
+        this.element.onChange = () => {
+            this.setPath()
+        }
+
+        if (this.attrs) {
+            for (let key in this.attrs) {
+                this.element.setAttribute(key, this.attrs[key])
+            }
+        }
 
 
         this.element.setAttribute('d', '')
@@ -156,8 +173,8 @@ class Path {
         this.root.insertBefore(this.element, this.root.firstElementChild)
     }
 
-    setPoints() {
-        this.points = this._points.map(p => {
+    set Points(points) {
+        this.points = points.map(p => {
 
             if (!p.control) {
                 return new Point({
@@ -168,7 +185,7 @@ class Path {
             }
 
             return {
-                control: p.control,
+                control: this.controls[p.control],
                 points: p.points.map(q => {
                     return new Point({
                         type: 'control',
@@ -181,7 +198,7 @@ class Path {
         })
     }
 
-    getPoints() {
+    get Points() {
         let d = [];
         for (let item of this.points) {
 
@@ -189,7 +206,7 @@ class Path {
                 d.push(item.toJSON())
             } else {
                 d.push({
-                    control: item.control,
+                    control: this.controls.indexOf(item.control),
                     points: item.points.map(i => i.toJSON())
                 })
             }
@@ -200,6 +217,12 @@ class Path {
 
     setPath() {
         let d = [];
+
+        if (this.points.length === 0) {
+            return
+        }
+
+
         for (let item of this.points) {
 
             if (item instanceof Point) {
@@ -220,67 +243,76 @@ class Path {
         this.element.setAttribute('d', 'M ' + d.join(' '))
     }
 
-
-
     get d() {
-        return this.element.getAttribute('d')
+        const d = this.element.getAttribute('d')
+
+        return d.split(' ')
+            .map(e => (e.indexOf(',') !== -1 ?
+                e.split(',').map(i => parseFloat(i)) : e))
     }
 
-
-    onChange = () => {
-        this.setPath()
+    set d(p) {
+        this.element.setAttribute('d',
+            p.map(e => Array.isArray(e) ? e.join(',') : e).join(' '))
     }
+
 }
 
 
 const SVG = {
     root: document.querySelector('#drawing svg'),
+    paths: [],
+    addPath(opts) {
+        this.paths.push(new Path({
+            root: this.root,
+            ...opts
+        }))
+    }
 }
 
+const points = [
+    {
+        x: 90,
+        y: 90,
+        draggable: true
+    },
+    {
+        control: 2,
+        points: [
+            {
+                x: 290,
+                y: 190,
+                draggable: true
+            },
+            {
+                x: 300,
+                y: 290,
+                draggable: true
+            }
+        ]
+    },
+    {
+        x: 350,
+        y: 150,
+        draggable: true
+    },
+    {
+        control: 1,
+        points: [
+            {
+                x: 350,
+                y: 250,
+                draggable: true
+            },
+        ]
+    },
+    {
+        x: 550,
+        y: 350,
+        draggable: true
+    },
+]
 
-const path = new Path({
-    root: SVG.root,
-    points: [{ "x": 44, "y": 53, "r": 5, "draggable": true }, { "control": "C", "points": [{ "x": 57, "y": 323, "r": 5, "draggable": true }, { "x": 738, "y": 61, "r": 5, "draggable": true }] }, { "x": 570, "y": 432, "r": 5, "draggable": true }, { "control": "Q", "points": [{ "x": 834, "y": 213, "r": 5, "draggable": true }] }, { "x": 403, "y": 113, "r": 5, "draggable": true }]
-    // points: [
-    //     {
-    //         x: 90,
-    //         y: 90,
-    //         draggable: true
-    //     },
-    //     {
-    //         control: 'C',
-    //         points: [
-    //             {
-    //                 x: 290,
-    //                 y: 190,
-    //                 draggable: true
-    //             },
-    //             {
-    //                 x: 300,
-    //                 y: 290,
-    //                 draggable: true
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         x: 350,
-    //         y: 150,
-    //         draggable: true
-    //     },
-    //     {
-    //         control: 'Q',
-    //         points: [
-    //             {
-    //                 x: 350,
-    //                 y: 250,
-    //                 draggable: true
-    //             },
-    //         ]
-    //     },
-    //     {
-    //         x: 550,
-    //         y: 350,
-    //         draggable: true
-    //     },
-    // ]
-})
+
+
+SVG.addPath({ points, attrs: { id: 'mypath' } })
