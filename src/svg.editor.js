@@ -45,7 +45,7 @@ class Point {
 
     constructor({ root, x, y, r = 5,
         path = null, polyline = null,
-        type = 'vertex', draggable = false,
+        type = 'vertex', draggable = true,
     }) {
         this.element = null
 
