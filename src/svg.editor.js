@@ -206,7 +206,8 @@ class Path {
     set Points(points) {
         this.points = points.map(p => {
 
-            if (!p.control) {
+            if (p.control === undefined) {
+
                 return new Point({
                     root: this.root,
                     path: this.element,
@@ -298,13 +299,5 @@ const SVG = {
             root: this.root,
             ...opts
         }))
-    },
-    stringify(n, ...args) {
-        const p = this.paths[n]
-
-        return {
-            d: p.d.map(e => Array.isArray(e) ? e.join(',') : e).join(' '),
-            points: JSON.stringify(p.Points, ...args)
-        }
     }
 }

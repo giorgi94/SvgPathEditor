@@ -1,5 +1,5 @@
 
-const points = [
+let points = [
     {
         "x": 90,
         "y": 90,
@@ -45,8 +45,13 @@ const points = [
         "y": 350,
         "r": 5,
         "draggable": true
-    }
+    },
 ]
 
 
+
+
 SVG.addPath({ points, attrs: { id: 'mypath' } })
+
+
+const path = SVG.paths[0]
