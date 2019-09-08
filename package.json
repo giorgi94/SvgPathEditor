@@ -1,0 +1,21 @@
+{
+    "name": "svg-path-editor",
+    "version": "1.1",
+    "description": "A Simple Svg path Editor",
+    "main": "src/svg.editor.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/giorgi94/SvgPathEditor.git"
+    },
+    "keywords": [
+        "svg",
+        "path",
+        "editor",
+        "edit"
+    ],
+    "author": "giorgik1994@gmail.com",
+    "license": "MIT",
+    "devDependencies": {
+        "eslint": "^5.16.0"
+    }
+}
