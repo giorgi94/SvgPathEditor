@@ -1,4 +1,4 @@
-const SVG = (function () {
+const SVGEditor = (function () {
 
     function dragPoint(point) {
 
@@ -288,6 +288,12 @@ const SVG = (function () {
                 p.map(e => Array.isArray(e) ? e.join(",") : e).join(" "));
         }
 
+        save() {
+            return JSON.stringify([
+                this.root.getBoundingClientRect().width,
+                this.d,
+            ]);
+        }
     }
 
 
