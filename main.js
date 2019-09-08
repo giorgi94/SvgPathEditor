@@ -34,12 +34,12 @@ let points = [
         "x": 550,
         "y": 350,
     },
-]
+];
 
 
 
 
-SVG.addPath({ points, attrs: { id: 'mypath' } })
+SVG.addPath({ points, attrs: { id: "mypath" } });
 
 
-const path = SVG.paths[0]
+const path = SVG.paths[0];

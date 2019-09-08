@@ -5,11 +5,10 @@
 
 #drawing {
     height: 500px;
-    width: 90%;
+    width: 100%;
 
-    border: 1px solid #000000;
+    border-bottom: 1px solid #000000;
     margin: auto;
-    margin-top: 10px;
     display: block;
 }
 
